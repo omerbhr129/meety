@@ -1,6 +1,6 @@
 {
-  "extends": ["next", "next/core-web-vitals"],
-  "parserOptions": {
-    "project": "./tsconfig.json"
+  "extends": "next",
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "error"
   }
 }
