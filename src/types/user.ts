@@ -1,16 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 import bcrypt from 'bcryptjs';
 
-export interface UserType {
-  email: string;
-  password: string;
-  fullName: string;
-  profileImage?: string;
-  lastLogin?: Date;
-  createdAt: Date;
-  comparePassword(candidatePassword: string): Promise<boolean>;
-}
-
+// הגדרת טיפוסים
 export interface Meeting {
   id: string;
   title: string;
@@ -27,11 +18,14 @@ export interface UserType {
   profileImage?: string;
   lastLogin?: Date;
   createdAt: Date;
-  meetings?: Meeting[]; // הוספת מאפיין meetings
+  meetings?: Meeting[];
 }
 
-interface UserDocument extends Document, UserType {}
+interface UserDocument extends Document, UserType {
+  comparePassword(candidatePassword: string): Promise<boolean>;
+}
 
+// סכמת המשתמש
 const userSchema = new Schema<UserDocument>({
   email: {
     type: String,
@@ -60,6 +54,16 @@ const userSchema = new Schema<UserDocument>({
     type: Date,
     default: Date.now,
   },
+  meetings: [
+    {
+      id: { type: String, required: true },
+      title: { type: String, required: true },
+      startTime: { type: Date, required: true },
+      endTime: { type: Date, required: true },
+      description: String,
+      participants: [String],
+    },
+  ],
 });
 
 // Middleware להצפנת סיסמה לפני שמירת משתמש
@@ -77,7 +81,40 @@ userSchema.methods.comparePassword = async function (
   return bcrypt.compare(candidatePassword, this.password);
 };
 
+// ייצוא המודל
 const User = mongoose.model<UserDocument>('User', userSchema);
-
-// ייצוא המודל וייצוא הטיפוס
 export default User;
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials extends LoginCredentials {
+  fullName: string;
+}
+
+export interface AuthResponse {
+  token: string;
+  user: UserType;
+}
+
+// טיפוסים קיימים
+export interface Meeting {
+  id: string;
+  title: string;
+  startTime: Date;
+  endTime: Date;
+  description?: string;
+  participants?: string[];
+}
+
+export interface UserType {
+  email: string;
+  password: string;
+  fullName: string;
+  profileImage?: string;
+  lastLogin?: Date;
+  createdAt: Date;
+  meetings?: Meeting[];
+}
