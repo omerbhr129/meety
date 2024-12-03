@@ -8,6 +8,9 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true
   },
+  experimental: {
+    forceSwcTransforms: true
+  },
   webpack: (config) => {
     config.module.rules.push({
       test: /\.(ts|tsx)$/,
