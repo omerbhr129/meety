@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import httpProxy from 'http-proxy';
-import { IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage } from 'http';
 import Cors from 'cors';
 
 // Initialize CORS middleware
@@ -11,9 +11,17 @@ const cors = Cors({
 });
 
 // Helper method to wait for a middleware to execute before continuing
-function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: Function) {
+function runMiddleware(
+  req: NextApiRequest, 
+  res: NextApiResponse, 
+  fn: (
+    req: NextApiRequest,
+    res: NextApiResponse,
+    callback: (result: Error | unknown) => void
+  ) => void
+) {
   return new Promise((resolve, reject) => {
-    fn(req, res, (result: any) => {
+    fn(req, res, (result: Error | unknown) => {
       if (result instanceof Error) {
         return reject(result);
       }
@@ -162,7 +170,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       // Forward the request
-      proxy.web(req, res, proxyOptions, (err) => {
+      proxy.web(req, res, proxyOptions, (err: Error) => {
         console.error('Proxy error:', err);
         if (!res.headersSent) {
           res.status(500).json({
@@ -174,7 +182,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       // Handle proxy errors
-      proxy.on('error', (err) => {
+      proxy.on('error', (err: Error) => {
         console.error('Proxy error:', err);
         if (!res.headersSent) {
           res.status(500).json({
@@ -186,7 +194,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       });
 
       // Handle proxy request
-      proxy.on('proxyReq', (proxyReq, req, res) => {
+      proxy.on('proxyReq', () => {
         console.log('Proxy request:', {
           method: req.method,
           url: req.url,
