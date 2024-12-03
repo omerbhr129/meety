@@ -1,151 +1,85 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const userSettingsSchema = new mongoose.Schema({
-  theme: {
-    type: String,
-    enum: ['light', 'dark'],
-    default: 'light'
-  },
-  language: {
-    type: String,
-    enum: ['he', 'en'],
-    default: 'he'
-  },
-  notifications: {
-    email: {
-      type: Boolean,
-      default: true
-    },
-    push: {
-      type: Boolean,
-      default: true
-    }
-  },
-  timezone: {
-    type: String,
-    default: 'Asia/Jerusalem'
-  }
-});
-
 const userSchema = new mongoose.Schema({
   email: {
     type: String,
-    required: true,
+    required: [true, 'Email is required'],
     unique: true,
+    trim: true,
     lowercase: true,
-    trim: true
+    match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email']
   },
   password: {
     type: String,
-    required: function() {
-      return !this.googleId;
-    },
-    minlength: 6
+    required: [true, 'Password is required'],
+    minlength: [6, 'Password must be at least 6 characters long']
   },
-  googleId: String,
-  name: {
+  fullName: {
     type: String,
-    required: true,
+    required: [true, 'Full name is required'],
     trim: true
   },
   profileImage: {
     type: String,
-    default: '/images/default-avatar.png'
-  },
-  phone: {
-    type: String,
-    trim: true,
-    validate: {
-      validator: function(v) {
-        return /^(\+?\d{1,3}[- ]?)?\d{10}$/.test(v);
-      },
-      message: 'מספר טלפון לא תקין'
-    }
-  },
-  company: {
-    type: String,
     trim: true
   },
-  position: {
+  role: {
     type: String,
-    trim: true
-  },
-  bio: {
-    type: String,
-    maxlength: 500
-  },
-  isVerified: {
-    type: Boolean,
-    default: false
-  },
-  settings: {
-    type: userSettingsSchema,
-    default: () => ({})
-  },
-  lastLogin: Date,
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
-  verificationToken: String,
-  meetings: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Meeting'
-  }],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
+    enum: ['user', 'admin'],
+    default: 'user'
   },
   status: {
     type: String,
-    enum: ['active', 'inactive', 'suspended'],
+    enum: ['active', 'inactive', 'deleted'],
     default: 'active'
+  },
+  lastLogin: {
+    type: Date
   }
-});
-
-// מידלוור לעדכון תאריך העדכון האחרון
-userSchema.pre('save', async function(next) {
-  this.updatedAt = new Date();
-  
-  if (this.isModified('password') && this.password) {
-    try {
-      this.password = await bcrypt.hash(this.password, 10);
-    } catch (error) {
-      return next(error);
+}, {
+  timestamps: true,
+  toJSON: {
+    transform: function(doc, ret) {
+      // Keep _id instead of renaming to id
+      delete ret.password;
+      delete ret.__v;
+      return ret;
     }
   }
-  next();
 });
 
-// מתודה להשוואת סיסמאות
+// Pre-save middleware to hash password
+userSchema.pre('save', async function(next) {
+  try {
+    // Only hash the password if it has been modified (or is new)
+    if (!this.isModified('password')) {
+      return next();
+    }
+
+    // Generate salt
+    const salt = await bcrypt.genSalt(10);
+    
+    // Hash password
+    this.password = await bcrypt.hash(this.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  if (!this.password) return false;
-  return bcrypt.compare(candidatePassword, this.password);
+  try {
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    throw error;
+  }
 };
 
-// מתודה ליצירת טוקן לאיפוס סיסמה
-userSchema.methods.createPasswordResetToken = function() {
-  const resetToken = crypto.randomBytes(32).toString('hex');
-  this.resetPasswordToken = crypto
-    .createHash('sha256')
-    .update(resetToken)
-    .digest('hex');
-  this.resetPasswordExpires = Date.now() + 3600000; // תוקף של שעה
-  return resetToken;
-};
-
-// וירטואל לקבלת שם מלא
-userSchema.virtual('fullName').get(function() {
-  return this.name || this.email.split('@')[0];
-});
-
-// הגדרת אינדקסים
-userSchema.index({ email: 1, googleId: 1 });
+// Add index for efficient queries
+userSchema.index({ email: 1 });
 userSchema.index({ status: 1 });
-userSchema.index({ createdAt: -1 });
 
 const User = mongoose.model('User', userSchema);
 

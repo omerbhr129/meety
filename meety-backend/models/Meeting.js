@@ -1,103 +1,203 @@
 const mongoose = require('mongoose');
+const crypto = require('crypto');
+
+const timeSlotSchema = new mongoose.Schema({
+  start: {
+    type: String,
+    required: true
+  },
+  end: {
+    type: String,
+    required: true
+  }
+});
+
+const bookedSlotSchema = new mongoose.Schema({
+  date: {
+    type: String,
+    required: true
+  },
+  time: {
+    type: String,
+    required: true
+  },
+  participant: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Participant',
+    required: true
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'completed', 'missed'],
+    default: 'pending'
+  }
+});
+
+const dayAvailabilitySchema = new mongoose.Schema({
+  enabled: {
+    type: Boolean,
+    default: false
+  },
+  timeSlots: {
+    type: [timeSlotSchema],
+    default: () => [{
+      start: '09:00',
+      end: '17:00'
+    }]
+  }
+});
+
+const availabilitySchema = new mongoose.Schema({
+  sunday: {
+    type: dayAvailabilitySchema,
+    default: () => ({
+      enabled: false,
+      timeSlots: [{
+        start: '09:00',
+        end: '17:00'
+      }]
+    })
+  },
+  monday: {
+    type: dayAvailabilitySchema,
+    default: () => ({
+      enabled: false,
+      timeSlots: [{
+        start: '09:00',
+        end: '17:00'
+      }]
+    })
+  },
+  tuesday: {
+    type: dayAvailabilitySchema,
+    default: () => ({
+      enabled: false,
+      timeSlots: [{
+        start: '09:00',
+        end: '17:00'
+      }]
+    })
+  },
+  wednesday: {
+    type: dayAvailabilitySchema,
+    default: () => ({
+      enabled: false,
+      timeSlots: [{
+        start: '09:00',
+        end: '17:00'
+      }]
+    })
+  },
+  thursday: {
+    type: dayAvailabilitySchema,
+    default: () => ({
+      enabled: false,
+      timeSlots: [{
+        start: '09:00',
+        end: '17:00'
+      }]
+    })
+  },
+  friday: {
+    type: dayAvailabilitySchema,
+    default: () => ({
+      enabled: false,
+      timeSlots: [{
+        start: '09:00',
+        end: '17:00'
+      }]
+    })
+  },
+  saturday: {
+    type: dayAvailabilitySchema,
+    default: () => ({
+      enabled: false,
+      timeSlots: [{
+        start: '09:00',
+        end: '17:00'
+      }]
+    })
+  }
+});
 
 const meetingSchema = new mongoose.Schema({
   title: {
     type: String,
-    required: true,
-    trim: true
+    required: [true, 'Title is required']
   },
   description: {
-    type: String,
-    trim: true
+    type: String
   },
-  organizer: {
+  duration: {
+    type: Number,
+    required: [true, 'Duration is required'],
+    min: [15, 'Duration must be at least 15 minutes'],
+    max: [180, 'Duration cannot exceed 180 minutes']
+  },
+  type: {
+    type: String,
+    enum: ['video', 'phone', 'in-person'],
+    default: 'video'
+  },
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
   },
-  participants: [{
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    },
-    status: {
-      type: String,
-      enum: ['pending', 'accepted', 'declined'],
-      default: 'pending'
-    },
-    notified: {
-      type: Boolean,
-      default: false
-    }
-  }],
-  startTime: {
-    type: Date,
-    required: true
-  },
-  endTime: {
-    type: Date,
-    required: true
-  },
-  type: {
-    type: String,
-    enum: ['virtual', 'physical', 'phone'],
-    required: true
-  },
-  location: {
-    type: String,
-    required: function() {
-      return this.type === 'physical';
-    }
-  },
-  meetingLink: {
-    type: String,
-    required: function() {
-      return this.type === 'virtual';
-    }
-  },
   status: {
     type: String,
-    enum: ['scheduled', 'cancelled', 'completed'],
-    default: 'scheduled'
+    enum: ['active', 'inactive', 'deleted'],
+    default: 'active'
   },
-  reminders: [{
-    time: Date,
-    sent: {
-      type: Boolean,
-      default: false
-    }
-  }],
-  notes: {
+  bookedSlots: {
+    type: [bookedSlotSchema],
+    default: () => []
+  },
+  availability: {
+    type: availabilitySchema,
+    required: true,
+    default: () => ({
+      sunday: { enabled: false, timeSlots: [{ start: '09:00', end: '17:00' }] },
+      monday: { enabled: false, timeSlots: [{ start: '09:00', end: '17:00' }] },
+      tuesday: { enabled: false, timeSlots: [{ start: '09:00', end: '17:00' }] },
+      wednesday: { enabled: false, timeSlots: [{ start: '09:00', end: '17:00' }] },
+      thursday: { enabled: false, timeSlots: [{ start: '09:00', end: '17:00' }] },
+      friday: { enabled: false, timeSlots: [{ start: '09:00', end: '17:00' }] },
+      saturday: { enabled: false, timeSlots: [{ start: '09:00', end: '17:00' }] }
+    })
+  },
+  shareableLink: {
     type: String,
-    trim: true
-  },
-  attachments: [{
-    name: String,
-    url: String,
-    type: String
-  }],
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: Date
+    unique: true,
+    default: () => crypto.randomBytes(16).toString('hex')
+  }
+}, {
+  timestamps: true,
+  toJSON: {
+    transform: function(doc, ret) {
+      if (ret.userId) {
+        ret.userId = ret.userId.toString();
+      }
+      if (ret.bookedSlots) {
+        ret.bookedSlots = ret.bookedSlots.map(slot => ({
+          ...slot,
+          participant: slot.participant ? {
+            _id: slot.participant._id?.toString(),
+            fullName: slot.participant.fullName,
+            email: slot.participant.email,
+            phone: slot.participant.phone
+          } : slot.participant
+        }));
+      }
+      return ret;
+    }
+  }
 });
 
-// מידלוור לעדכון תאריך העדכון
-meetingSchema.pre('save', function(next) {
-  this.updatedAt = new Date();
-  next();
-});
-
-// וירטואל לחישוב משך הפגישה
-meetingSchema.virtual('duration').get(function() {
-  return (this.endTime - this.startTime) / (1000 * 60); // בדקות
-});
-
-// אינדקסים
-meetingSchema.index({ organizer: 1, startTime: -1 });
-meetingSchema.index({ participants: 1 });
-meetingSchema.index({ status: 1 });
+// Add indexes for efficient queries
+meetingSchema.index({ userId: 1, status: 1 });
+meetingSchema.index({ 'bookedSlots.date': 1 });
+meetingSchema.index({ 'bookedSlots.status': 1 });
 
 const Meeting = mongoose.model('Meeting', meetingSchema);
 

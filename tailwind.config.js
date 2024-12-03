@@ -16,6 +16,13 @@ module.exports = {
       },
     },
     extend: {
+      transitionTimingFunction: {
+        'smooth-in': 'cubic-bezier(0.4, 0, 0.2, 1)',
+        'smooth-out': 'cubic-bezier(0.8, 0, 0.6, 1)',
+      },
+      transitionDuration: {
+        '400': '400ms',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

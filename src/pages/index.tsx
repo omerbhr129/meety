@@ -1,15 +1,18 @@
 import { Eye, EyeOff } from "lucide-react"
 import React, { useState, ChangeEvent, FormEvent } from "react"
 import { useRouter } from 'next/router'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { useToast } from "@/components/ui/use-toast"
+import { Button } from "../components/ui/button"
+import { Input } from "../components/ui/input"
+import { useToast } from "../components/ui/use-toast"
+import { useAuth } from "../lib/auth"
 import Head from 'next/head'
 import Link from 'next/link'
+import axios from 'axios'
 
 export default function LoginPage() {
   const router = useRouter()
   const { toast } = useToast()
+  const { login } = useAuth()
   const [isLogin, setIsLogin] = useState(true)
   const [formData, setFormData] = useState({
     email: "",
@@ -53,25 +56,29 @@ export default function LoginPage() {
     }
 
     try {
-      // דמו התחברות
-      setTimeout(() => {
-        localStorage.setItem("token", "dummy-token")
-        localStorage.setItem("userFullName", formData.fullName || "משתמש")
-        
-        toast({
-          title: "הצלחה!",
-          description: isLogin ? "התחברת בהצלחה!" : "נרשמת בהצלחה!"
-        })
-        
-        router.push('/dashboard')
-      }, 1000)
-
+      console.log('Attempting login with:', formData.email);
+      await login(formData.email, formData.password)
+      toast({
+        title: "הצלחה!",
+        description: "התחברת בהצלחה!"
+      })
+      router.push('/dashboard')
     } catch (err) {
       console.error('Error:', err)
+      let errorMessage = "שגיאה בפעולה, אנא נסה שוב"
+      
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        if (err.response.data.message === 'Invalid credentials') {
+          errorMessage = "שם משתמש או סיסמה שגויים"
+        } else {
+          errorMessage = err.response.data.message
+        }
+      }
+      
       toast({
         variant: "destructive",
         title: "שגיאה",
-        description: "שגיאה בפעולה, אנא נסה שוב"
+        description: errorMessage
       })
     } finally {
       setLoading(false)
@@ -81,7 +88,7 @@ export default function LoginPage() {
   return (
     <>
       <Head>
-        <title>Meety | {isLogin ? 'התחברות' : 'הרשמה'}</title>
+        <title>{`${isLogin ? 'התחברות' : 'הרשמה'} | Meety`}</title>
       </Head>
       <div
         className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 flex items-center justify-center"
@@ -192,13 +199,11 @@ export default function LoginPage() {
 
               <div className="flex justify-start text-sm">
                 {isLogin && (
-                  <button 
-                    onClick={() => router.push('/reset-password')}
-                    type="button"
-                    className="text-blue-600 hover:text-blue-700 transition-colors mr-1"
-                  >
+                  <Link 
+                    href="/reset-password" 
+                    className="text-blue-600 hover:text-blue-700 transition-colors mr-1">
                     שכחת סיסמה?
-                  </button>
+                  </Link>
                 )}
               </div>
 
