@@ -34,7 +34,6 @@ const getUTCDayOfWeek = (dateStr) => {
   return localDay;
 };
 
-
 // Helper function to parse time string to minutes
 const parseTime = (timeStr) => {
   const [hours, minutes] = timeStr.split(':').map(Number);
@@ -155,7 +154,7 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads'), {
 
 // CORS configuration
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5004'],
+  origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5004', 'https://meetyil.com'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -930,9 +929,3 @@ mongoose.connect(process.env.MONGODB_URI)
     console.error('MongoDB connection error:', err);
     process.exit(1);
   });
-
-
-
-
-
-
