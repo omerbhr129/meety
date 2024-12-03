@@ -18,8 +18,11 @@
       }
     }
   ],
-  "rewrites": [
-    { "source": "/api/:match*", "destination": "/meety-backend/server.js" }
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/meety-backend/server.js"
+    }
   ],
   "env": {
     "MONGODB_URI": "mongodb+srv://automaticil129:Oo129129@cluster0.r0ste.mongodb.net/meety?retryWrites=true&w=majority&appName=Cluster0",
