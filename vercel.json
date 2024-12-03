@@ -14,7 +14,8 @@
         },
         "typescript": {
           "ignoreBuildErrors": true
-        }
+        },
+        "outputDirectory": ".next"
       }
     }
   ],
