@@ -1,8 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "framework": "nextjs",
   "builds": [
     {
       "src": "meety-backend/server.js",
@@ -22,10 +19,7 @@
     }
   ],
   "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "meety-backend/server.js"
-    }
+    { "source": "/api/:match*", "destination": "/meety-backend/server.js" }
   ],
   "env": {
     "MONGODB_URI": "mongodb+srv://automaticil129:Oo129129@cluster0.r0ste.mongodb.net/meety?retryWrites=true&w=majority&appName=Cluster0",
