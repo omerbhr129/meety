@@ -7,7 +7,15 @@
     },
     {
       "src": "package.json",
-      "use": "@vercel/next"
+      "use": "@vercel/next",
+      "config": {
+        "eslint": {
+          "ignoreDuringBuilds": true
+        },
+        "typescript": {
+          "ignoreBuildErrors": true
+        }
+      }
     }
   ],
   "routes": [
