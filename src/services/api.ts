@@ -6,7 +6,7 @@ import { toast } from '../components/ui/use-toast';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: '/api',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
