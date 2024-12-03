@@ -25,7 +25,9 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5004/:path*'
+        destination: process.env.NODE_ENV === 'production' 
+          ? '/api/:path*'  // בסביבת ייצור נשתמש בנתיב יחסי
+          : 'http://localhost:5004/:path*'  // בסביבת פיתוח נשתמש בשרת המקומי
       }
     ]
   }

@@ -31,7 +31,7 @@ function AppContent({ Component, pageProps }: AppProps) {
 
   const containerClasses = [
     'min-h-screen flex flex-col',
-    !isLoginPage && 'bg-gradient-to-br from-blue-50 to-indigo-100 fixed inset-0'
+    !isLoginPage && 'bg-gradient-to-br from-blue-50 to-indigo-100'
   ].filter(Boolean).join(' ')
 
   const contentClasses = [
@@ -40,8 +40,7 @@ function AppContent({ Component, pageProps }: AppProps) {
   ].filter(Boolean).join(' ')
 
   return (
-    <>
-      <div className={containerClasses} />
+    <div className={containerClasses}>
       <div className={contentClasses}>
         {!isBookingPage && !isLoginPage && !isBookingSuccess && user && (
           <Sidebar onCollapse={handleSidebarCollapse} />
@@ -55,7 +54,7 @@ function AppContent({ Component, pageProps }: AppProps) {
         </main>
         <Toaster />
       </div>
-    </>
+    </div>
   )
 }
 

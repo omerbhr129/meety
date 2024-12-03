@@ -2,11 +2,11 @@ import axios, { InternalAxiosRequestConfig, AxiosError } from 'axios';
 import { Meeting } from '../types/meeting';
 import { User, CreateUserDto, UpdateUserDto, LoginUserDto, AuthResponse } from '../types/user';
 import { Participant, CreateParticipantDto, CreateParticipantResponse } from '../types/participant';
-import { toast } from '@/components/ui/use-toast';
+import { toast } from '../components/ui/use-toast';
 
 // Create axios instance with default config
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004',
+  baseURL: '/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -223,12 +223,12 @@ export const deleteParticipant = async (participantId: string) => {
 };
 
 // Booking APIs
-
 interface BookMeetingDto {
   date: string;
   time: string;
   participant: string;  // participant ID
 }
+
 export const bookMeeting = async (shareableLink: string, bookingData: BookMeetingDto) => {
   try {
     console.log('Booking meeting:', { shareableLink, data: bookingData });
@@ -343,5 +343,3 @@ export const register = async (userData: CreateUserDto) => {
     throw error;
   }
 };
-
-
