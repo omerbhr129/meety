@@ -25,8 +25,8 @@
     }
   ],
   "env": {
-    "MONGODB_URI": "mongodb+srv://automaticil129:Oo129129@cluster0.r0ste.mongodb.net/meety?retryWrites=true&w=majority&appName=Cluster0",
-    "NEXT_PUBLIC_API_URL": "/api",
-    "JWT_SECRET": "your-secret-key"
+    "MONGODB_URI": "mongodb+srv://meety:meety@cluster0.yyenq.mongodb.net/meety",
+    "NEXT_PUBLIC_API_URL": "https://meaty-backend.vercel.app/",
+    "JWT_SECRET": "sdfsDFsdfsdfsdf"
   }
 }
