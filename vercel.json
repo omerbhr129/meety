@@ -1,0 +1,32 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "meety-backend/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "package.json",
+      "use": "@vercel/next",
+      "config": {
+        "eslint": {
+          "ignoreDuringBuilds": true
+        },
+        "typescript": {
+          "ignoreBuildErrors": true
+        }
+      }
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "/meety-backend/server.js"
+    }
+  ],
+  "env": {
+    "MONGODB_URI": "mongodb+srv://automaticil129:Oo129129@cluster0.r0ste.mongodb.net/meety?retryWrites=true&w=majority&appName=Cluster0",
+    "NEXT_PUBLIC_API_URL": "/api",
+    "JWT_SECRET": "your-secret-key"
+  }
+}

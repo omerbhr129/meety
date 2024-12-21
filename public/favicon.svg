@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1d4ed8"/>
+      <stop offset="50%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#60a5fa"/>
+    </linearGradient>
+    <!-- הוספת צל עדין -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="0.5" stdDeviation="0.5" flood-color="#1d4ed8" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Rounded Square Background with subtle inner shadow -->
+  <rect x="0" y="0" width="32" height="32" rx="8" fill="url(#gradient)">
+    <animate attributeName="rx" 
+             values="8;10;8" 
+             dur="10s" 
+             repeatCount="indefinite"/>
+  </rect>
+  
+  <!-- Letter M with enhanced styling -->
+  <text x="16" y="22.5" 
+        text-anchor="middle"
+        font-family="'Inter', system-ui, sans-serif"
+        font-size="21"
+        font-weight="800"
+        fill="white"
+        filter="url(#shadow)"
+        letter-spacing="-0.5">
+    M
+  </text>
+</svg>
