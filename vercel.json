@@ -2,10 +2,6 @@
   "version": 2,
   "builds": [
     {
-      "src": "meety-backend/server.js",
-      "use": "@vercel/node"
-    },
-    {
       "src": "package.json",
       "use": "@vercel/next",
       "config": {
@@ -18,26 +14,7 @@
       }
     }
   ],
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/meety-backend/server.js"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        { "key": "Access-Control-Allow-Credentials", "value": "true" },
-        { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization" }
-      ]
-    }
-  ],
   "env": {
-    "MONGODB_URI": "mongodb+srv://automaticil129:Oo129129@cluster0.r0ste.mongodb.net/meety?retryWrites=true&w=majority&appName=Cluster0",
-    "NEXT_PUBLIC_API_URL": "https://meety-7b3qdn4pe-omerbhr129s-projects.vercel.app/api",
-    "JWT_SECRET": "your-secret-key"
+    "NEXT_PUBLIC_API_URL": "https://meety-backend-ten.vercel.app"
   }
 }
