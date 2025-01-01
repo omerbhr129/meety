@@ -19,6 +19,16 @@ import { toast } from '../components/ui/use-toast';
 const MAX_RETRIES = 3;
 const RETRY_DELAY = 1000;
 
+// פונקציית עזר לקביעת ה-baseURL
+const getBaseUrl = () => {
+  // בסביבת פיתוח, נשתמש ב-env variable
+  if (process.env.NODE_ENV === 'development') {
+    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004';
+  }
+  // בסביבת ייצור, נשתמש בנתיב יחסי
+  return '/api';
+};
+
 // פונקציית עזר לניסיון חוזר
 const retryRequest = async (
   fn: () => Promise<AxiosResponse>,
@@ -39,7 +49,7 @@ const retryRequest = async (
 // יצירת instance של axios עם הגדרות מתקדמות
 export const api = axios.create({
   timeout: 10000, // timeout של 10 שניות
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004',
+  baseURL: getBaseUrl(),
   withCredentials: true
 });
 
@@ -60,7 +70,7 @@ api.interceptors.request.use(async (config) => {
 
 // Create a public API instance without auth
 const publicApi = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004',
+  baseURL: getBaseUrl(),
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
