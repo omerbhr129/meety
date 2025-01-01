@@ -202,7 +202,7 @@ export default function AdminDashboard() {
                 <th className="text-right py-3 px-4 font-medium text-gray-600">שם מלא</th>
                 <th className="text-right py-3 px-4 font-medium text-gray-600">אימייל</th>
                 <th className="text-right py-3 px-4 font-medium text-gray-600">כניסה אחרונה</th>
-                <th className="text-right py-3 px-4 font-medium text-gray-600">סה"כ פגישות</th>
+                <th className="text-right py-3 px-4 font-medium text-gray-600">סה&quot;כ פגישות</th>
                 <th className="text-right py-3 px-4 font-medium text-gray-600">פגישות מתוכננות</th>
               </tr>
             </thead>
