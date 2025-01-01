@@ -111,8 +111,7 @@ const Settings = () => {
       setIsLoading(true);
       const updateData: any = {
         fullName: formData.fullName,
-        email: formData.email,
-        profileImage: user?.profileImage || null
+        email: formData.email
       };
 
       if (formData.currentPassword && formData.newPassword) {
@@ -220,7 +219,7 @@ const Settings = () => {
                 onImageRemove={async () => {
                   try {
                     setIsLoading(true);
-                    const { user: updatedUser } = await updateUserProfile({ profileImage: null });
+                    const { user: updatedUser } = await updateUserProfile({});
                     updateUser(updatedUser);
                     toast({
                       title: "התמונה הוסרה בהצלחה",

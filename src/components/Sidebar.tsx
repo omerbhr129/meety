@@ -171,7 +171,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onCollapse }) => {
                       <div className="w-12 h-12 rounded-xl overflow-hidden ring-2 ring-blue-200 ring-offset-2 transition-all duration-300 group-hover:ring-blue-300 group-hover:shadow-lg group-hover:scale-105">
                         <img
                           key={Date.now()}
-                          src={`${user.profileImage}?t=${Date.now()}`}
+                          src={user.profileImage}
                           alt={userFullName}
                           className="w-full h-full object-cover"
                           onError={(e) => {
