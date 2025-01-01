@@ -21,12 +21,12 @@ const RETRY_DELAY = 1000;
 
 // פונקציית עזר לקביעת ה-baseURL
 const getBaseUrl = () => {
-  // בסביבת פיתוח, נשתמש ב-env variable
+  // בסביבת פיתוח, נשתמש בלוקאלהוסט
   if (process.env.NODE_ENV === 'development') {
-    return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004';
+    return 'http://localhost:5004';
   }
-  // בסביבת ייצור, נשתמש בנתיב יחסי
-  return '/api';
+  // בסביבת ייצור, נשתמש בכתובת האמיתית של השרת
+  return 'https://meety-backend.vercel.app';
 };
 
 // פונקציית עזר לניסיון חוזר
