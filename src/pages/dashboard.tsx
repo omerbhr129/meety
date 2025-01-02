@@ -799,10 +799,14 @@ return (
               meetings.map((meeting) => (
                 <Card
                   key={meeting._id}
-                  className="overflow-hidden bg-white/90 backdrop-blur-sm border-blue-100/50 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg"
+                  className={`overflow-hidden bg-white/90 backdrop-blur-sm border-blue-100/50 transition-all duration-300 ${
+                    editingStatus === meeting._id 
+                      ? 'scale-[1.02] shadow-lg' 
+                      : 'hover:scale-[1.02] hover:shadow-lg'
+                  } relative group`}
                 >
                   <div className="p-6 border-b border-gray-100">
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center relative">
                       <div className="flex items-center gap-3">
                         <div className="bg-blue-100 p-3 rounded-lg">
                           {meeting.type === 'video' ? (
@@ -815,17 +819,27 @@ return (
                         </div>
                         <h3 className="text-lg font-semibold text-gray-900">{meeting.title}</h3>
                       </div>
-                      <DropdownMenu>
+                      <DropdownMenu onOpenChange={(open) => {
+                        if (open) {
+                          setEditingStatus(meeting._id!);
+                        } else {
+                          setEditingStatus(null);
+                        }
+                      }}>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full hover:scale-[1.02] transition-all"
+                            className="text-gray-400 hover:text-gray-600 rounded-full hover:scale-[1.02] transition-all duration-200 absolute top-2 left-2 focus:outline-none focus:bg-transparent active:bg-transparent focus-visible:ring-0 data-[state=open]:bg-transparent"
                           >
                             <MoreVertical className="h-5 w-5" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent 
+                          align="end" 
+                          side="top"
+                          className="min-w-fit"
+                        >
                           <DropdownMenuItem
                             onClick={() => handleEditMeeting(meeting)}
                             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 flex items-center gap-2"

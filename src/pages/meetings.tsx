@@ -162,7 +162,7 @@ const MeetingCard: React.FC<MeetingCardProps> = ({ slot, index, onStatusUpdate, 
   
   return (
     <>
-      <Card className={`${isDropdownOpen ? 'shadow-lg scale-[1.02]' : ''} transition-all duration-300`}>
+      <Card className={`hover:shadow-lg hover:scale-[1.02] ${isDropdownOpen ? 'shadow-lg scale-[1.02]' : ''} transition-all duration-300`}>
         <CardContent className="p-6">
           <div className="flex items-start gap-6">
             {/* Date and Time Badge */}
@@ -224,22 +224,22 @@ const MeetingCard: React.FC<MeetingCardProps> = ({ slot, index, onStatusUpdate, 
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="hover:bg-gray-100 rounded-full hover:scale-[1.02] transition-all"
+                        className="hover:bg-transparent rounded-full hover:scale-[1.02] transition-all focus:outline-none focus:bg-transparent active:bg-transparent focus-visible:ring-0 data-[state=open]:bg-transparent"
                       >
                         <MoreVertical className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuContent align="end" side="top" className="text-right">
                       <DropdownMenuItem
                         onClick={() => router.push(`/meeting/edit/${slot._id}?meetingId=${slot.meetingId}`)}
-                        className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
+                                                  className="flex items-center justify-end gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
                       >
                         <Pencil className="h-4 w-4" />
                         <span>ערוך</span>
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => setShowDeleteDialog(true)}
-                        className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+                                                  className="flex items-center justify-end gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
                       >
                         <Trash2 className="h-4 w-4" />
                         <span>מחק</span>
@@ -459,69 +459,45 @@ const SelectedDayMeetings: React.FC<SelectedDayMeetingsProps> = ({
                                   }
                                   
                                   return isEnded && (
-                            <div className="scale-90">
-                              <StatusButton 
-                                meetingId={item.meeting._id!}
-                                slot={item.slot}
-                                onStatusUpdate={onStatusUpdate}
-                              />
-                            </div>
+                                    <div className="scale-90">
+                                      <StatusButton 
+                                        meetingId={item.meeting._id!}
+                                        slot={item.slot}
+                                        onStatusUpdate={onStatusUpdate}
+                                      />
+                                    </div>
                                   );
                                 })()}
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  onClick={() => router.push(`/meeting/edit/${item.slot._id}?meetingId=${item.meeting._id}`)}
-                                  className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                                >
-                                  <Pencil className="h-4 w-4" />
-                                </Button>
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      variant="ghost"
-                                      size="sm"
-                                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="hover:bg-transparent rounded-full hover:scale-[1.02] transition-all focus:bg-transparent"
+                      >
+                                      <MoreVertical className="h-4 w-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="start" side="top" className="text-right">
+                                    <DropdownMenuItem
+                                      onClick={() => router.push(`/meeting/edit/${item.slot._id}?meetingId=${item.meeting._id}`)}
+                                      className="flex justify-end gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer w-full"
+                                    >
+                                      <Pencil className="h-4 w-4" />
+                                      <span>ערוך</span>
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem
+                                      onClick={async () => {
+                                        await onDelete(item.meeting._id!, item.slot._id!);
+                                        onClose();
+                                      }}
+                                      className="flex justify-end gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer w-full"
                                     >
                                       <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="max-w-md" dir="rtl">
-                                    <DialogHeader className="text-center pb-2">
-                                      <div className="mx-auto w-12 h-12 rounded-full bg-gradient-to-r from-red-50 to-red-100 flex items-center justify-center mb-4">
-                                        <Trash2 className="h-6 w-6 text-red-600" />
-                                      </div>
-                                      <DialogTitle className="text-center text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
-                                        מחיקת פגישה
-                                      </DialogTitle>
-                                      <DialogDescription className="text-center mt-2">
-                                        האם אתה בטוח שברצונך למחוק את הפגישה?
-                                        <br />
-                                        פעולה זו לא ניתנת לביטול.
-                                      </DialogDescription>
-                                    </DialogHeader>
-                                    <div className="flex gap-4 pt-4">
-                                      <Button
-                                        variant="destructive"
-                                        onClick={async () => {
-                                          await onDelete(item.meeting._id!, item.slot._id!);
-                                          onClose();
-                                        }}
-                                        className="flex-1 p-6 text-lg hover:scale-[1.02] transition-all"
-                                      >
-                                        מחק
-                                      </Button>
-                                      <DialogClose asChild>
-                                        <Button
-                                          variant="outline"
-                                          className="flex-1 p-6 text-lg hover:bg-gray-50 hover:scale-[1.02] transition-all"
-                                        >
-                                          ביטול
-                                        </Button>
-                                      </DialogClose>
-                                    </div>
-                                  </DialogContent>
-                                </Dialog>
+                                      <span>מחק</span>
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
                             </div>
                           </div>
@@ -1116,7 +1092,7 @@ const MeetingsPage: React.FC = () => {
                             exit="exit"
                             className="w-full"
                           >
-                                                      {getPastMeetings(historyTab).length === 0 ? (
+                            {getPastMeetings(historyTab).length === 0 ? (
                               <Card className="hover:scale-[1.02] transition-all duration-300">
                                 <CardContent className="p-12 text-center">
                                   <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -1140,103 +1116,13 @@ const MeetingsPage: React.FC = () => {
                             ) : (
                               <div className="space-y-8">
                                 {getPastMeetings(historyTab).map((slot, index) => (
-                                  <Card key={index} className="hover:scale-[1.02] transition-all duration-300">
-                                    <CardContent className="p-6">
-                                    <div className="flex items-start gap-6">
-                                      <div className="w-40">
-                                        <div className="text-center px-3 py-2 rounded-xl bg-gradient-to-l from-blue-500/5 to-blue-600/5 border border-blue-100">
-                                          {/* תאריך */}
-                                          <div className="text-blue-700 font-medium mb-2">
-                                            {new Date(slot.date).toLocaleDateString('he-IL', {
-                                              day: 'numeric',
-                                              month: 'long',
-                                              year: 'numeric'
-                                            })}
-                                          </div>
-                                          {/* שעה */}
-                                          <div className="flex items-center justify-center gap-2 text-blue-700 font-medium">
-                                            <Clock className="h-4 w-4" />
-                                            <span>{slot.time}</span>
-                                          </div>
-                                        </div>
-                                      </div>
-
-                                      <div className="flex-1">
-                                        <div className="flex items-center justify-between mb-4">
-                                          <div className="flex items-center gap-3">
-                                            <div className={`
-                                              w-8 h-8 rounded-lg flex items-center justify-center shadow-md
-                                              ${slot.type === 'video' ? 'bg-blue-500' : 
-                                                slot.type === 'phone' ? 'bg-green-500' : 'bg-purple-500'}
-                                            `}>
-                                              {slot.type === 'video' ? (
-                                                <Video className="h-4 w-4 text-white" />
-                                              ) : slot.type === 'phone' ? (
-                                                <Phone className="h-4 w-4 text-white" />
-                                              ) : (
-                                                <Users className="h-4 w-4 text-white" />
-                                              )}
-                                            </div>
-                                            <div>
-                                              <h3 className="text-lg font-bold text-gray-900">{slot.participant?.fullName || "אין משתתף"}</h3>
-                                              <div className="text-sm text-gray-500 mt-0.5">
-                                                {slot.title}
-                                              </div>
-                                            </div>
-                                          </div>
-                                          <div className="flex items-center gap-4">
-                                            <StatusButton 
-                                              meetingId={slot.meetingId}
-                                              slot={slot}
-                                              onStatusUpdate={handleStatusUpdate}
-                                            />
-                                            <DropdownMenu>
-                                              <DropdownMenuTrigger asChild>
-                                                <Button
-                                                  variant="ghost"
-                                                  size="icon"
-                                                  className="hover:bg-gray-100 rounded-full hover:scale-[1.02] transition-all"
-                                                >
-                                                  <MoreVertical className="h-4 w-4" />
-                                                </Button>
-                                              </DropdownMenuTrigger>
-                                              <DropdownMenuContent align="end" className="w-40">
-                                                <DropdownMenuItem
-                                                  onClick={() => router.push(`/meeting/edit/${slot._id}?meetingId=${slot.meetingId}`)}
-                                                  className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-50 cursor-pointer"
-                                                >
-                                                  <Pencil className="h-4 w-4" />
-                                                  <span>ערוך</span>
-                                                </DropdownMenuItem>
-                                                <DropdownMenuItem
-                                                  onClick={async () => {
-                                                    await handleDeleteSlot(slot.meetingId, slot._id!);
-                                                  }}
-                                                  className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
-                                                >
-                                                  <Trash2 className="h-4 w-4" />
-                                                  <span>מחק</span>
-                                                </DropdownMenuItem>
-                                              </DropdownMenuContent>
-                                            </DropdownMenu>
-                                          </div>
-                                        </div>
-
-                                        {/* פרטי קשר */}
-                                        <div className="grid grid-cols-2 gap-4">
-                                          <div className="flex items-center justify-center gap-4 p-4 rounded-xl bg-gradient-to-l from-blue-500/5 to-blue-600/5 border border-blue-100">
-                                            <span className="text-base text-gray-700 truncate">{slot.participant?.email}</span>
-                                            <Mail className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                                          </div>
-                                          <div className="flex items-center justify-center gap-4 p-4 rounded-xl bg-gradient-to-l from-blue-500/5 to-blue-600/5 border border-blue-100">
-                                            <span className="text-base text-gray-700 truncate">{slot.participant?.phone}</span>
-                                            <Phone className="h-5 w-5 text-blue-600 flex-shrink-0" />
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                    </CardContent>
-                                  </Card>
+                                  <MeetingCard 
+                                    key={index} 
+                                    slot={slot} 
+                                    index={index} 
+                                    onStatusUpdate={handleStatusUpdate}
+                                    onDelete={handleDeleteSlot}
+                                  />
                                 ))}
   
                                 {/* Show More Button for Past Meetings */}
@@ -1253,14 +1139,14 @@ const MeetingsPage: React.FC = () => {
                                   if (slot.status === 'missed') return historyTab === 'missed';
                                   return historyTab === 'completed' && (slot.status === 'completed' || !slot.status);
                                 }).length > 3 && (
-                                  <Button
-                                    variant="outline"
-                                    className="w-full mt-8 hover:scale-[1.02] transition-all"
-                                    onClick={() => setShowAllPastMeetings(!showAllPastMeetings)}
-                                  >
-                                    <ChevronDown className={`h-4 w-4 ml-2 transition-transform duration-200 ${showAllPastMeetings ? 'rotate-180' : ''}`} />
-                                    {showAllPastMeetings ? 'הצג פחות' : 'הצג הכל'}
-                                  </Button>
+                                <Button
+                                  variant="outline"
+                                  className="w-full mt-8 hover:scale-[1.02] transition-all"
+                                  onClick={() => setShowAllPastMeetings(!showAllPastMeetings)}
+                                >
+                                  <ChevronDown className={`h-4 w-4 ml-2 transition-transform duration-200 ${showAllPastMeetings ? 'rotate-180' : ''}`} />
+                                  {showAllPastMeetings ? 'הצג פחות' : 'הצג הכל'}
+                                </Button>
                                 )}
                               </div>
                             )}
@@ -1347,7 +1233,8 @@ const MeetingsPage: React.FC = () => {
                               >
                                 <div className={`font-medium mb-2 ${today ? 'text-blue-600' : 'text-gray-600'}`}>
                                   {dayNumber}
-                                </div><div className="space-y-1.5">
+                                </div>
+                                <div className="space-y-1.5">
     {todayMeetings.map((meeting) =>
       meeting.bookedSlots?.filter(slot => slot.status !== 'deleted').map((slot, slotIndex) => {
         const slotDate = adjustDateForTimezone(slot.date);

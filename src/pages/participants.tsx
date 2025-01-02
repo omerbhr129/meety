@@ -369,7 +369,7 @@ function ParticipantsPage() {
             transition={{ delay: index * 0.1 }}
             className="w-full"
           >
-            <Card className="overflow-hidden hover:shadow-lg hover:scale-[1.02] transition-all duration-300 h-[200px]">
+            <Card className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-[1.02] [&:has([data-state=open])]:shadow-lg [&:has([data-state=open])]:scale-[1.02] h-[200px]">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-4">
@@ -391,7 +391,7 @@ function ParticipantsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full hover:scale-[1.02] transition-all"
+                            className="text-gray-400 hover:text-gray-600 hover:bg-transparent ring-0 rounded-full hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:bg-transparent active:bg-transparent focus-visible:ring-0 data-[state=open]:bg-transparent data-[state=closed]:bg-transparent group-hover:text-gray-600"
                       >
                         <MoreVertical className="h-5 w-5" />
                       </Button>
@@ -502,7 +502,7 @@ function ParticipantsPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full hover:scale-[1.02] transition-all"
+                            className="text-gray-400 hover:text-gray-600 rounded-full hover:scale-[1.02] transition-all duration-200 focus:outline-none focus:bg-transparent active:bg-transparent focus-visible:ring-0 data-[state=open]:bg-transparent data-[state=closed]:bg-transparent"
                           >
                             <MoreVertical className="h-5 w-5" />
                           </Button>
