@@ -26,7 +26,7 @@ const getBaseUrl = () => {
     return 'http://localhost:5004';
   }
   // בסביבת ייצור, נשתמש בכתובת האמיתית של השרת
-  return 'https://meety-backend.vercel.app';
+  return 'https://meety-backend-ten.vercel.app';
 };
 
 // פונקציית עזר לניסיון חוזר
