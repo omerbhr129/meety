@@ -7,6 +7,15 @@ import { User, UpdateUserDto } from '../types/user';
 import { useToast } from '../components/ui/use-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UserAvatar } from '../components/ui/user-avatar';
+import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+
+const s3Client = new S3Client({
+  region: process.env.NEXT_PUBLIC_S3_REGION,
+  credentials: {
+    accessKeyId: process.env.NEXT_PUBLIC_S3_ACCESS_KEY!,
+    secretAccessKey: process.env.NEXT_PUBLIC_S3_SECRET_KEY!,
+  },
+});
 
 const Settings = () => {
   const { user, updateUser, logout } = useAuth();
@@ -33,11 +42,10 @@ const Settings = () => {
     }));
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleImageUpload = async (file: File) => {
     if (!file) return;
-
-    // Client-side image validation and optimization
+  
+    // Client-side image validation
     if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
       toast({
         title: "שגיאה בהעלאת התמונה",
@@ -49,7 +57,7 @@ const Settings = () => {
       }
       return;
     }
-
+  
     if (file.size > 5 * 1024 * 1024) {
       toast({
         title: "שגיאה בהעלאת התמונה",
@@ -61,13 +69,35 @@ const Settings = () => {
       }
       return;
     }
-
+  
     try {
       setIsLoading(true);
-      const formData = new FormData();
-      formData.append('image', file, file.name);
+  
+      // Generate a unique filename
+      const fileExtension = file.name.split('.').pop();
+      const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
+  
+      // Upload directly to S3
+      const command = new PutObjectCommand({
+        Bucket: process.env.NEXT_PUBLIC_S3_BUCKET_NAME!,
+        Key: uniqueFileName,
+        Body: file,
+        ContentType: file.type,
+      });
+  
+      await s3Client.send(command);
+  
+      // Generate the S3 URL
+      const imageUrl = `https://${process.env.NEXT_PUBLIC_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_S3_REGION}.amazonaws.com/${uniqueFileName}`;
+  
+      // First, update the profile image URL in the backend
+      await api.put('/user/profile-image', { imageUrl });
+  
+      // Then update the user profile
+      const { user: updatedUser } = await updateUserProfile({
+        profileImage: imageUrl
+      });
       
-      const { user: updatedUser } = await uploadProfileImage(formData);
       updateUser(updatedUser);
       
       toast({
@@ -194,28 +224,7 @@ const Settings = () => {
                 editable={true}
                 user={user || undefined}
                 className="w-32 h-32"
-                onImageChange={async (file) => {
-                  const formData = new FormData();
-                  formData.append('image', file);
-                  try {
-                    setIsLoading(true);
-                    const { user: updatedUser } = await uploadProfileImage(formData);
-                    updateUser(updatedUser);
-                    toast({
-                      title: "התמונה הועלתה בהצלחה",
-                      description: "תמונת הפרופיל שלך עודכנה",
-                    });
-                  } catch (error: any) {
-                    console.error('Error uploading image:', error);
-                    toast({
-                      title: "שגיאה בהעלאת התמונה",
-                      description: error.response?.data?.message || "אנא נסה שוב מאוחר יותר",
-                      variant: "destructive",
-                    });
-                  } finally {
-                    setIsLoading(false);
-                  }
-                }}
+                onImageChange={handleImageUpload}
                 onImageRemove={async () => {
                   try {
                     setIsLoading(true);
