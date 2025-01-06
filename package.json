@@ -29,6 +29,7 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-switch": "^1.0.3",
     "@radix-ui/react-toast": "^1.2.2",
+    "@react-oauth/google": "^0.12.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/formidable": "^3.4.5",
     "@types/http-proxy": "^1.17.15",

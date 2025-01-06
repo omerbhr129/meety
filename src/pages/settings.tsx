@@ -228,8 +228,15 @@ const Settings = () => {
                 onImageRemove={async () => {
                   try {
                     setIsLoading(true);
+                    // First update the profile image URL to the placeholder in the backend
+                    await api.put('/user/profile-image', { 
+                      imageUrl: 'https://st3.depositphotos.com/9998432/13335/v/450/depositphotos_133351928-stock-illustration-default-placeholder-man-and-woman.jpg' 
+                    });
+
+                    // Then update the user profile
                     const { user: updatedUser } = await updateUserProfile({});
                     updateUser(updatedUser);
+                    
                     toast({
                       title: "התמונה הוסרה בהצלחה",
                       description: "תמונת הפרופיל שלך הוסרה",

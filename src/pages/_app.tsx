@@ -9,6 +9,8 @@ import { useAuth } from '../lib/auth'
 import { useState, useEffect } from 'react'
 import { PageTransition } from '../components/PageTransition'
 import { LoadingSpinner } from '../components/ui/loading-spinner'
+import { GoogleOAuthProvider } from '@react-oauth/google';
+
 
 function AppContent({ Component, pageProps }: AppProps) {
   const router = useRouter()
@@ -79,8 +81,10 @@ function AppContent({ Component, pageProps }: AppProps) {
 
 export default function App(props: AppProps) {
   return (
-    <AuthProvider>
-      <AppContent {...props} />
-    </AuthProvider>
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
+      <AuthProvider>
+        <AppContent {...props} />
+      </AuthProvider>
+    </GoogleOAuthProvider>
   )
 }

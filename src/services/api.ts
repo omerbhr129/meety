@@ -150,7 +150,7 @@ api.interceptors.response.use(async (response) => {
       } else if (typeof window !== 'undefined') {
         console.log('Invalid token, clearing and redirecting to login');
         localStorage.removeItem('token');
-        window.location.href = '/';
+        // window.location.href = '/';
       }
     } else if (error.response?.status === 400) {
       toast({
@@ -493,6 +493,40 @@ export const login = async (email: string, password: string) => {
     return response.data;
   } catch (error) {
     console.error('Login error:', error);
+    throw error;
+  }
+};
+
+// services/api.ts
+export const googleLogin = async (accessToken: string) => {
+  try {
+    console.log('Attempting Google login with access token');
+    const response = await publicApi.post<AuthResponse>('/auth/google', { 
+      token: accessToken
+    });
+    
+    console.log('Google login response:', {
+      status: response.status,
+      hasToken: !!response.data?.token,
+      hasUser: !!response.data?.user
+    });
+    
+    return response.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('Google login error:', {
+        status: error.response?.status,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      if (error.response?.status === 500) {
+        throw new Error('שגיאת שרת בהתחברות עם Google. אנא נסה שנית.');
+      }
+      if (error.response?.status === 401) {
+        throw new Error('Token לא תקין או פג תוקף. אנא נסה להתחבר שנית.');
+      }
+    }
     throw error;
   }
 };

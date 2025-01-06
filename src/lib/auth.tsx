@@ -1,12 +1,15 @@
+// lib/auth.tsx
 import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
+import { useGoogleLogin } from '@react-oauth/google';
 import { User } from '../types/user';
-import { login as apiLogin, getCurrentUser } from '../services/api';
+import { login as apiLogin, getCurrentUser, googleLogin } from '../services/api';
 
 interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
+  googleSignIn: () => Promise<void>;
   logout: () => void;
   loading: boolean;
   updateUser: (user: User) => void;
@@ -15,13 +18,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   token: null,
-  login: async () => {},
-  logout: () => {},
+  login: async () => { },
+  googleSignIn: async () => { },
+  logout: () => { },
   loading: true,
-  updateUser: () => {},
+  updateUser: () => { },
 });
 
-// רשימת נתיבים ציבוריים שלא דורשים התחברות
 const publicPaths = ['/', '/book', '/book/[typeId]'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -65,7 +68,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         const isAuthenticated = await checkAuth();
         const isPublicPath = publicPaths.some(path => {
-          // בדיקה אם הנתיב הנוכחי הוא דינמי (כמו /book/[typeId])
           if (path.includes('[') && path.includes(']')) {
             const pathPattern = path.replace(/\[.*?\]/g, '[^/]+');
             const regex = new RegExp(`^${pathPattern}$`);
@@ -92,7 +94,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('Login response:', response);
 
       const { token: newToken, user: newUser } = response;
-      
+
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', newToken);
       }
@@ -103,6 +105,51 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       await router.push('/dashboard');
     } catch (error) {
       console.error('Login error:', error);
+      throw error;
+    }
+  };
+
+  // Initialize the Google login hook
+  const googleLoginMutation = useGoogleLogin({
+    onSuccess: async (codeResponse) => {
+      try {
+        // Get ID token
+        const tokens = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: new URLSearchParams({
+            code: codeResponse.code,
+            client_id: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!,
+            client_secret: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_SECRET!,
+            redirect_uri: 'postmessage',
+            grant_type: 'authorization_code',
+          }),
+        }).then(res => res.json());
+
+        console.log('Google tokens:', tokens);
+
+        // Send ID token to your backend
+        const { token, user: newUser } = await googleLogin(tokens.id_token);
+
+        localStorage.setItem('token', token);
+        setToken(token);
+        setUser(newUser);
+        await router.push('/dashboard');
+      } catch (error) {
+        console.error('Error in Google sign-in:', error);
+        throw error;
+      }
+    },
+    flow: 'auth-code',
+  });
+
+  const googleSignIn = async () => {
+    try {
+      await googleLoginMutation();
+    } catch (error) {
+      console.error('Google sign-in error:', error);
       throw error;
     }
   };
@@ -125,6 +172,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     token,
     login,
+    googleSignIn,
     logout,
     loading,
     updateUser,
@@ -155,7 +203,6 @@ export function withAuth<P extends object>(
     useEffect(() => {
       if (!loading) {
         const isPublicPath = publicPaths.some(path => {
-          // בדיקה אם הנתיב הנוכחי הוא דינמי (כמו /book/[typeId])
           if (path.includes('[') && path.includes(']')) {
             const pathPattern = path.replace(/\[.*?\]/g, '[^/]+');
             const regex = new RegExp(`^${pathPattern}$`);
@@ -179,7 +226,6 @@ export function withAuth<P extends object>(
       );
     }
 
-    // אפשר גישה לדפים ציבוריים גם ללא התחברות
     const isPublicPath = publicPaths.some(path => {
       if (path.includes('[') && path.includes(']')) {
         const pathPattern = path.replace(/\[.*?\]/g, '[^/]+');
