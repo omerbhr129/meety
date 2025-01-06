@@ -232,10 +232,6 @@ const Settings = () => {
                     await api.put('/user/profile-image', { 
                       imageUrl: 'https://st3.depositphotos.com/9998432/13335/v/450/depositphotos_133351928-stock-illustration-default-placeholder-man-and-woman.jpg' 
                     });
-
-                    // Then update the user profile
-                    const { user: updatedUser } = await updateUserProfile({});
-                    updateUser(updatedUser);
                     
                     toast({
                       title: "התמונה הוסרה בהצלחה",

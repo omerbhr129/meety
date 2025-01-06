@@ -23,7 +23,7 @@ const RETRY_DELAY = 1000;
 const getBaseUrl = () => {
   // בסביבת פיתוח, נשתמש בלוקאלהוסט
   if (process.env.NODE_ENV === 'development') {
-    return 'http://localhost:5004';
+    return 'https://meety-backend-ten.vercel.app';
   }
   // בסביבת ייצור, נשתמש בכתובת האמיתית של השרת
   return 'https://meety-backend-ten.vercel.app';
