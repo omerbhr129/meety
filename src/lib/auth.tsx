@@ -93,7 +93,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       console.log('Attempting login with:', email);
       const response = await apiLogin(email, password);
       console.log('Login response in auth.js:', response);
-      console.log('response?.needsVerification:', response?.needsVerification);
+      console.log('response?.needsVerification:', );
 
       // Check if email needs verification
       if (response?.needsVerification) {

@@ -109,7 +109,6 @@ export default function LoginPage() {
           title: "הצלחה!",
           description: "התחברת בהצלחה!"
         })
-        router.push('/dashboard')
       } else {
         // Handle registration
         console.log('Attempting registration with:', formData.email);
