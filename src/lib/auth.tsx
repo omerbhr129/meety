@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 import { useGoogleLogin } from '@react-oauth/google';
 import { User } from '../types/user';
 import { login as apiLogin, getCurrentUser, googleLogin } from '../services/api';
+import { encryptData } from '../utils/encryption';
 
 interface AuthContextType {
   user: User | null;
@@ -91,7 +92,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       console.log('Attempting login with:', email);
       const response = await apiLogin(email, password);
-      console.log('Login response:', response);
+      console.log('Login response in auth.js:', response);
+      console.log('response?.needsVerification:', response?.needsVerification);
+
+      // Check if email needs verification
+      if (response?.needsVerification) {
+        const encryptedUserId = encryptData(response.userId);
+        await router.push(`/otpVerification?uid=${encryptedUserId}`);
+        return;
+      }
 
       const { token: newToken, user: newUser } = response;
 
