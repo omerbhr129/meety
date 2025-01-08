@@ -9,7 +9,6 @@ import Head from 'next/head'
 import Link from 'next/link'
 import axios from 'axios'
 import { register } from "../services/api"
-import { encryptData } from "../utils/encryption"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -105,15 +104,7 @@ export default function LoginPage() {
     try {
       if (isLogin) {
         console.log('Attempting login with:', formData.email);
-        const response = await login(formData.email, formData.password)
-
-        // Check if email needs verification
-        if (response.needsVerification) {
-          const encryptedUserId = encryptData(response.userId);
-          router.push(`/otpVerification?uid=${encryptedUserId}`)
-          return
-        }
-
+        await login(formData.email, formData.password)
         toast({
           title: "הצלחה!",
           description: "התחברת בהצלחה!"
@@ -128,13 +119,12 @@ export default function LoginPage() {
           fullName: formData.fullName
         })
 
-        const encryptedUserId = encryptData(response.userId);
-        router.push(`/otpVerification?uid=${encryptedUserId}`)
-
+        // After successful registration, log the user in
         toast({
           title: "הצלחה!",
-          description: "נרשמת בהצלחה! אנא אמת את כתובת האימייל שלך"
+          description: "נרשמת והתחברת בהצלחה!"
         })
+        router.push('/dashboard')
       }
     } catch (err) {
       console.error('Error:', err)

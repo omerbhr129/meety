@@ -48,4 +48,6 @@ export interface UpdateUserDto {
 export interface AuthResponse {
   token: string;
   user: User;
+  needsVerification: boolean;
+  userId: string;
 }
