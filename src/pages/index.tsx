@@ -9,6 +9,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import axios from 'axios'
 import { register } from "../services/api"
+import { encryptData } from "@/utils/encryption"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -118,12 +119,15 @@ export default function LoginPage() {
           fullName: formData.fullName
         })
 
-        // After successful registration, log the user in
+        // After successful registration, show toast and redirect to OTP verification
         toast({
           title: "הצלחה!",
-          description: "נרשמת והתחברת בהצלחה!"
+          description: "נרשמת והצלחה! אנא אמת את כתובת האימייל שלך"
         })
-        router.push('/dashboard')
+        // Assuming the response includes the encrypted user ID
+        const encryptedUserId = encryptData(response.userId);
+        await router.push(`/otpVerification?uid=${encryptedUserId}`);
+        return; // Add return to prevent any further execution
       }
     } catch (err) {
       console.error('Error:', err)
