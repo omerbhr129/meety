@@ -20,6 +20,7 @@ function AppContent({ Component, pageProps }: AppProps) {
   const isBookingPage = router.pathname.startsWith('/book/')
   const isLoginPage = router.pathname === '/'
   const isBookingSuccess = router.pathname === '/booking-success'
+  const isOtpVerfication = router.pathname === '/otpVerification'
 
   useEffect(() => {
     const handleStart = () => setIsLoading(true)
@@ -42,7 +43,7 @@ function AppContent({ Component, pageProps }: AppProps) {
 
   const mainClasses = [
     'transition-all duration-500 ease-in-out flex-1 pb-24',
-    !isBookingPage && !isLoginPage && !isBookingSuccess && user && [
+    !isBookingPage && !isLoginPage && !isBookingSuccess && !isOtpVerfication && user && [
       'p-8',
       isSidebarCollapsed ? 'mr-20' : 'mr-64'
     ]
@@ -62,7 +63,7 @@ function AppContent({ Component, pageProps }: AppProps) {
     <>
       <div className={containerClasses} />
       <div className={contentClasses}>
-        {!isBookingPage && !isLoginPage && !isBookingSuccess && user && (
+        {!isBookingPage && !isLoginPage && !isBookingSuccess && !isOtpVerfication && user && (
           <Sidebar onCollapse={handleSidebarCollapse} />
         )}
         <main className={mainClasses}>

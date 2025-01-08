@@ -25,7 +25,7 @@ const AuthContext = createContext<AuthContextType>({
   updateUser: () => { },
 });
 
-const publicPaths = ['/', '/book', '/book/[typeId]'];
+const publicPaths = ['/', '/book', '/book/[typeId]', '/otpVerification'];
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);

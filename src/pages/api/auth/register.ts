@@ -12,7 +12,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ message: 'All fields are required' });
     }
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004'}/api/register`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5004'}/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,10 +23,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to register');
+      throw new Error(data.message || 'Failed to register');
     }
 
-    return res.status(200).json(data);
+    return res.status(201).json({
+      message: data.message,
+      userId: data.userId,
+      email: email
+    });
   } catch (error) {
     console.error('Registration error:', error);
     return res.status(500).json({ 

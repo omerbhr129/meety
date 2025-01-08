@@ -23,7 +23,7 @@ const RETRY_DELAY = 1000;
 const getBaseUrl = () => {
   // בסביבת פיתוח, נשתמש בלוקאלהוסט
   if (process.env.NODE_ENV === 'development') {
-    return 'https://meety-backend-ten.vercel.app';
+    return 'http://localhost:5004';
   }
   // בסביבת ייצור, נשתמש בכתובת האמיתית של השרת
   return 'https://meety-backend-ten.vercel.app';
@@ -540,6 +540,30 @@ export const register = async (userData: CreateUserDto) => {
     return response.data;
   } catch (error) {
     console.error('Registration error:', error);
+    throw error;
+  }
+};
+
+export const verifyOTP = async (userId: string, otp: string) => {
+  try {
+    console.log('Verifying OTP for user:', userId);
+    const response = await publicApi.post<AuthResponse>('/auth/verify-otp', { userId, otp });
+    console.log('OTP verification response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('OTP verification error:', error);
+    throw error;
+  }
+};
+
+export const resendOTP = async (userId: string) => {
+  try {
+    console.log('Resending OTP for user:', userId);
+    const response = await publicApi.post('/auth/resend-otp', { userId });
+    console.log('OTP resend response:', response.data);
+    return response.data;
+  } catch (error) {
+    console.error('OTP resend error:', error);
     throw error;
   }
 };
