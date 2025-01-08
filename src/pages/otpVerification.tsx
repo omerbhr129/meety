@@ -52,7 +52,6 @@ export default function OTPVerification() {
 
     try {
       const data = await resendOTP(userId);
-      alert(data.message || 'קוד חדש נשלח לאימייל שלך');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'שגיאה בשליחת הקוד');
     } finally {
