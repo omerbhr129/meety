@@ -34,7 +34,6 @@ next-env.d.ts
 
 # IDE
 .idea/
-.vscode/
 
 # Uploads
 /uploads
